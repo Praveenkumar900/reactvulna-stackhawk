@@ -39,3 +39,10 @@ jobs:
           apiKey: ${{ secrets.HAWK_API_KEY }}
         env:
           APP_ID: "e652f4b7-6bd9-477a-8030-cbd1204a8a95" # Replace with your React App ID
+      - name: Notify Slack on Failure
+        if: failure() # Only runs if a previous step (like StackHawk) fails
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_COLOR: '#ff0000'
+          SLACK_MESSAGE: '🚨 Security Scan Failed on Master!'
