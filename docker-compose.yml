@@ -1,0 +1,6 @@
+version: '3.8'
+services:
+  react-lab-app:
+    build: .
+    ports:
+      - "8080:80" # Maps Nginx's internal port 80 to the runner's port 8080
