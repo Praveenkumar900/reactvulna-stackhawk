@@ -1,0 +1,40 @@
+name: DevSecOps React Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # --- STEP 1: SCA Scan (Trivy) ---
+      # We scan the local filesystem for vulnerable dependencies before building
+      - name: Run Trivy FS Scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          severity: 'CRITICAL,HIGH'
+          exit-code: '0' # Set to 1 in real projects to fail the build
+
+      # --- STEP 2: Build & Start App ---
+      # Build the Docker image using the Multi-stage Dockerfile we created
+      - name: Build and Start React App
+        run: |
+          docker compose up -d --build
+          echo "Waiting for Nginx to serve React app..."
+          sleep 20 # Give Nginx time to start
+
+      # --- STEP 3: DAST Scan (StackHawk) ---
+      # The scanner attacks the live container running on port 8080
+      - name: Run StackHawk Scan
+        uses: stackhawk/hawkscan-action@v2
+        with:
+          apiKey: ${{ secrets.HAWK_API_KEY }}
+        env:
+          APP_ID: "e652f4b7-6bd9-477a-8030-cbd1204a8a95" # Replace with your React App ID
