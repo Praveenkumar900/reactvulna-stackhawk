@@ -1,0 +1,10 @@
+app:
+  applicationId: e652f4b7-6bd9-477a-8030-cbd1204a8a95 # Create a new "App" in StackHawk dashboard
+  host: http://localhost:8080
+  env: Development
+
+hawk:
+  spider:
+    base: true
+  scanner:
+    spa: true # Essential for React apps
